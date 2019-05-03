@@ -1,0 +1,8 @@
+git+https://git.direct-netware.de/dpt/file/@v1.0.0#egg=dpt-file
+git+https://git.direct-netware.de/dpt/logging/@v1.0.0#egg=dpt-logging
+git+https://git.direct-netware.de/dpt/mime_type/@v1.0.0#egg=dpt-mime-type
+git+https://git.direct-netware.de/dpt/module_loader/@v1.0.0#egg=dpt-module-loader
+git+https://git.direct-netware.de/dpt/runtime/@v1.0.0#egg=dpt-runtime
+git+https://git.direct-netware.de/dpt/threading/@v1.0.0#egg=dpt-threading
+
+git+https://git.direct-netware.de/dpt/builder_suite/@v1.0.0#egg=dpt-builder-suite[gitsrc]
