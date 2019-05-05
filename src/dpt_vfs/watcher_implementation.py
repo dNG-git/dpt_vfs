@@ -20,7 +20,9 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dpt_module_loader import NamedClassLoader
 from dpt_runtime.binary import Binary
 from dpt_runtime.io_exception import IOException
+from dpt_runtime.operation_not_supported_exception import OperationNotSupportedException
 from dpt_runtime.value_exception import ValueException
+from dpt_threading.thread_lock import ThreadLock
 
 from .abstract_watcher import AbstractWatcher
 
@@ -51,6 +53,39 @@ Deleted event
 Created event
     """
 
+    _classes = { }
+    """
+True if existing watchers have been disabled and no new ones can be
+initialized.
+    """
+    _is_disabled = False
+    """
+True if existing watchers have been disabled and no new ones can be
+initialized.
+    """
+    _lock = ThreadLock()
+    """
+Thread safety lock
+    """
+
+    @staticmethod
+    def disable():
+        """
+Disables all watchers and free callbacks for garbage collection.
+
+:since: v1.0.0
+        """
+
+        with WatcherImplementation._lock:
+            if (not WatcherImplementation._is_disabled):
+                WatcherImplementation._is_disabled = True
+
+                for vfs_scheme in WatcherImplementation._classes: WatcherImplementation._classes[vfs_scheme].disable()
+                WatcherImplementation._classes = None
+            #
+        #
+    #
+
     @staticmethod
     def get_class(scheme):
         """
@@ -60,11 +95,20 @@ Returns an VFS watcher class for the given scheme.
 :since:  v1.0.0
         """
 
-        _return = NamedClassLoader.get_class_in_namespace("dpt_vfs", "{0}.Watcher".format(scheme.replace("-", "_")))
+        with WatcherImplementation._lock:
+            if (WatcherImplementation._is_disabled): raise OperationNotSupportedException("VFS watcher creation has been disabled")
 
-        if (_return is None
-            or (not issubclass(_return, AbstractWatcher))
-           ): raise IOException("VFS watcher not defined for URL scheme '{0}'".format(scheme))
+            _return = WatcherImplementation._classes.get(scheme)
+
+            if (_return is None):
+                _return = NamedClassLoader.get_class_in_namespace("dpt_vfs", "{0}.Watcher".format(scheme.replace("-", "_")))
+
+                if (issubclass(_return, AbstractWatcher)): WatcherImplementation._classes[scheme] = _return
+                else: _return = None
+            #
+        #
+
+        if (_return is None): raise IOException("VFS watcher not defined for URL scheme '{0}'".format(scheme))
 
         return _return
     #
@@ -115,14 +159,28 @@ Returns the scheme of the VFS URL given if it is supported.
 
         _return = None
 
-        try:
-            scheme = WatcherImplementation.get_scheme_from_vfs_url(vfs_url)
+        if (not WatcherImplementation.is_disabled()):
+            try:
+                scheme = WatcherImplementation.get_scheme_from_vfs_url(vfs_url)
 
-            if (NamedClassLoader.is_defined_in_namespace("dpt_vfs", "{0}.Watcher".format(scheme.replace("-", "_")))):
-                _return = scheme
-            #
-        except ValueException: pass
+                if (NamedClassLoader.is_defined_in_namespace("dpt_vfs", "{0}.Watcher".format(scheme.replace("-", "_")))):
+                    _return = scheme
+                #
+            except ValueException: pass
+        #
 
         return _return
+    #
+
+    @staticmethod
+    def is_disabled():
+        """
+Returns true VFS watchers are disabled.
+
+:return: (bool) True if disabled
+:since:  v1.0.0
+        """
+
+        with WatcherImplementation._lock: return WatcherImplementation._is_disabled
     #
 #

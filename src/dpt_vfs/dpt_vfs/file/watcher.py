@@ -26,7 +26,7 @@ except ImportError:
 #
 
 from dpt_logging import LogLine
-from dpt_threading.thread_lock import ThreadLock
+from dpt_threading.instance_lock import InstanceLock
 
 from ...abstract_watcher import AbstractWatcher
 from .watcher_mtime import WatcherMtime
@@ -79,6 +79,19 @@ Synchronous pyinotify implementation
 Filesystem mtime implementation
     """
 
+    _implementation = None
+    """
+Watcher implementation instance
+    """
+    _instance = None
+    """
+Watcher implementation instance
+    """
+    _lock = InstanceLock()
+    """
+Thread safety lock
+    """
+
     def __init__(self):
         """
 Constructor __init__(Watcher)
@@ -86,20 +99,11 @@ Constructor __init__(Watcher)
 :since: v1.0.0
         """
 
-        self.implementation = None
-        """
-Watcher implementation instance
-        """
-        self._instance = None
-        """
-Watcher implementation instance
-        """
-        self._lock = ThreadLock()
-        """
-Thread safety lock
-        """
-
-        self.set_implementation()
+        if (Watcher._instance is None):
+            with Watcher._lock:
+                if (Watcher._instance is None): self.set_implementation()
+            #
+        #
     #
 
     @property
@@ -124,10 +128,7 @@ called.
 :since:  v1.0.0
         """
 
-        with self._lock:
-            if (self._instance is None): self._init_watcher()
-            return (type(self._instance) != WatcherPyinotify)
-        #
+        with Watcher._lock: return (not isinstance(Watcher._instance, WatcherPyinotify))
     #
 
     def check(self, url):
@@ -139,30 +140,13 @@ Checks a given URL for changes if "is_synchronous()" is true.
 :since: v1.0.0
         """
 
-        _path = self._get_path(url)
+        _path = Watcher._get_path(url)
 
-        with self._lock:
-            if (self._instance is None): self._init_watcher()
-
-            if (self._instance is not None
+        with Watcher._lock:
+            if (Watcher._instance is not None
                 and _path is not None
                 and _path.strip() != ""
-               ): self._instance.check(_path)
-        #
-    #
-
-    def disable(self):
-        """
-Disables this watcher and frees all callbacks for garbage collection.
-
-:since: v1.0.0
-        """
-
-        with self._lock:
-            self.free()
-            self.stop()
-
-            self.implementation = None
+               ): Watcher._instance.check(_path)
         #
     #
 
@@ -173,47 +157,8 @@ Frees all watcher callbacks for garbage collection.
 :since: v1.0.0
         """
 
-        with self._lock:
-            if (self._instance is not None): self._instance.free()
-        #
-    #
-
-    def _get_path(self, url):
-        """
-Return the local filesystem path for the given "file:///" URL.
-
-:param url: Filesystem URL
-
-:return: (str) Filesystem path; None if not a "file:///" URL
-:since:  v1.0.0
-        """
-
-        url_elements = urlsplit(url)
-        return (unquote_plus(url_elements.path[1:]) if (url_elements.scheme == "file") else None)
-    #
-
-    def _init_watcher(self):
-        """
-Initializes the watcher instance.
-
-:since: v1.0.0
-        """
-
-        if (self.implementation is not None):
-            instance_callable = WatcherMtime
-
-            if (WatcherPyinotify is not None):
-                if (self.implementation == _IMPLEMENTATION_INOTIFY): instance_callable = WatcherPyinotify.get_singleton
-                elif (self.implementation == _IMPLEMENTATION_INOTIFY_SYNC): instance_callable = WatcherPyinotifySync.get_singleton
-            #
-
-            try: self._instance = instance_callable()
-            except OSError:
-                if (instance_callable is WatcherMtime): raise
-                else: self._instance = WatcherMtime()
-            #
-
-            LogLine.debug("{0!r} mode is {1}", self, ("synchronous" if (self.is_synchronous) else "asynchronous"), context = "dpt_vfs")
+        with Watcher._lock:
+            if (Watcher._instance is not None): Watcher._instance.free()
         #
     #
 
@@ -230,13 +175,13 @@ if a callback is given but not defined for the watched URL.
 :since:  v1.0.0
         """
 
-        _path = self._get_path(url)
+        _path = Watcher._get_path(url)
 
-        with self._lock:
-            if (self._instance is None): self._init_watcher()
-
-            if (self._instance is None or _path is None or _path.strip() == ""): return False
-            else: return self._instance.is_watched(_path, callback)
+        with Watcher._lock:
+            return (False
+                    if (Watcher._instance is None or _path is None or _path.strip() == "") else
+                    Watcher._instance.is_watched(_path, callback)
+                   )
         #
     #
 
@@ -250,13 +195,13 @@ Handles registration of resource URL watches and its callbacks.
 :since:  v1.0.0
         """
 
-        _path = self._get_path(url)
+        _path = Watcher._get_path(url)
 
-        with self._lock:
-            if (self._instance is None): self._init_watcher()
-
-            if (self._instance is None or _path is None or _path.strip() == ""): return False
-            else: return self._instance.register(_path, callback)
+        with Watcher._lock:
+            return (False
+                    if (Watcher._instance is None or _path is None or _path.strip() == "") else
+                    Watcher._instance.register(_path, callback)
+                   )
         #
     #
 
@@ -271,17 +216,19 @@ Set the filesystem watcher implementation to use.
 
         # global: _IMPLEMENTATION_INOTIFY, _IMPLEMENTATION_INOTIFY_SYNC, _IMPLEMENTATION_MTIME, _mode
 
-        with self._lock:
-            if (self._instance is not None): self.stop()
-        #
+        with Watcher._lock:
+            if (Watcher._instance is not None): Watcher._instance.stop()
 
-        if (_mode == _IMPLEMENTATION_INOTIFY
-            and (implementation is None or implementation == _IMPLEMENTATION_INOTIFY)
-           ): self.implementation = _IMPLEMENTATION_INOTIFY
-        elif (_mode == _IMPLEMENTATION_INOTIFY
-              and implementation == _IMPLEMENTATION_INOTIFY_SYNC
-             ): self.implementation = _IMPLEMENTATION_INOTIFY_SYNC
-        else: self.implementation = _IMPLEMENTATION_MTIME
+            if (_mode == _IMPLEMENTATION_INOTIFY
+                and (implementation is None or implementation == _IMPLEMENTATION_INOTIFY)
+            ): Watcher._implementation = _IMPLEMENTATION_INOTIFY
+            elif (_mode == _IMPLEMENTATION_INOTIFY
+                and implementation == _IMPLEMENTATION_INOTIFY_SYNC
+                ): Watcher._implementation = _IMPLEMENTATION_INOTIFY_SYNC
+            else: Watcher._implementation = _IMPLEMENTATION_MTIME
+
+            Watcher._init_watcher()
+        #
     #
 
     def stop(self):
@@ -291,11 +238,8 @@ Stops all watchers.
 :since: v1.0.0
         """
 
-        with self._lock:
-            if (self._instance is not None):
-                self._instance.stop()
-                self._instance = None
-            #
+        with Watcher._lock:
+            if (Watcher._instance is not None): Watcher._instance.stop()
         #
     #
 
@@ -309,11 +253,68 @@ Handles deregistration of resource URL watches.
 :since:  v1.0.0
         """
 
-        _path = self._get_path(url)
+        _path = Watcher._get_path(url)
 
-        with self._lock:
-            if (self._instance is None or _path is None or _path.strip() == ""): return False
-            else: return self._instance.unregister(_path, callback)
+        with Watcher._lock:
+            return (False
+                    if (Watcher._instance is None or _path is None or _path.strip() == "") else
+                    Watcher._instance.unregister(_path, callback)
+                   )
+        #
+    #
+
+    @staticmethod
+    def disable():
+        """
+Disables this watcher and frees all callbacks for garbage collection.
+
+:since: v1.0.0
+        """
+
+        with Watcher._lock:
+            if (Watcher._instance is not None):
+                Watcher._instance.stop()
+                Watcher._instance = None
+
+                LogLine.debug("dpt_vfs.file.Watcher has been disabled", context = "dpt_vfs")
+            #
+        #
+    #
+
+    @staticmethod
+    def _get_path(url):
+        """
+Return the local filesystem path for the given "file:///" URL.
+
+:param url: Filesystem URL
+
+:return: (str) Filesystem path; None if not a "file:///" URL
+:since:  v1.0.0
+        """
+
+        url_elements = urlsplit(url)
+        return (unquote_plus(url_elements.path[1:]) if (url_elements.scheme == "file") else None)
+    #
+
+    @staticmethod
+    def _init_watcher():
+        """
+Initializes the watcher instance.
+
+:since: v1.0.0
+        """
+
+        instance_callable = WatcherMtime
+
+        if (WatcherPyinotify is not None):
+            if (Watcher._implementation == _IMPLEMENTATION_INOTIFY): instance_callable = WatcherPyinotify.get_singleton
+            elif (Watcher._implementation == _IMPLEMENTATION_INOTIFY_SYNC): instance_callable = WatcherPyinotifySync.get_singleton
+        #
+
+        try: Watcher._instance = instance_callable()
+        except OSError:
+            if (instance_callable is WatcherMtime): raise
+            else: Watcher._instance = WatcherMtime()
         #
     #
 #

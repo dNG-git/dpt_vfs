@@ -84,16 +84,6 @@ Checks a given URL for changes if "is_synchronous()" is true.
         raise NotImplementedException()
     #
 
-    def disable(self):
-        """
-Disables this watcher and frees all callbacks for garbage collection.
-
-:since: v1.0.0
-        """
-
-        self.free()
-    #
-
     def free(self):
         """
 Frees all watcher callbacks for garbage collection.
@@ -153,6 +143,17 @@ Handles deregistration of resource URL watches.
 
 :return: (bool) True on success
 :since:  v1.0.0
+        """
+
+        raise NotImplementedException()
+    #
+
+    @staticmethod
+    def disable():
+        """
+Disables this watcher and frees all callbacks for garbage collection.
+
+:since: v1.0.0
         """
 
         raise NotImplementedException()
