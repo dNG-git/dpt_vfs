@@ -19,6 +19,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=import-error
 
+from dpt_logging import LogLine
 from pyinotify import Notifier
 
 from .watcher_pyinotify import WatcherPyinotify
@@ -49,9 +50,9 @@ Checks a given path for changes if "is_synchronous()" is true.
         """
 
         with self._lock:
-            if (self.pyinotify_instance.check_events()):
-                self.pyinotify_instance.read_events()
-                self.pyinotify_instance.process_events()
+            if (self._pyinotify_instance.check_events()):
+                self._pyinotify_instance.read_events()
+                self._pyinotify_instance.process_events()
             #
         #
 
@@ -66,8 +67,9 @@ Initializes the pyinotify instance.
         """
 
         with self._lock:
-            if (self.pyinotify_instance is None):
-                self.pyinotify_instance = Notifier(self, WatcherPyinotifyCallback(self), timeout = 5)
+            if (self._pyinotify_instance is None):
+                LogLine.debug("{0!r} mode is synchronous", self, context = "dpt_vfs")
+                self._pyinotify_instance = Notifier(self, WatcherPyinotifyCallback(self), timeout = 5)
             #
         #
     #
@@ -81,7 +83,7 @@ Stops all watchers.
 
         with self._lock:
             self.free()
-            self.pyinotify_instance = None
+            self._pyinotify_instance = None
         #
     #
 #

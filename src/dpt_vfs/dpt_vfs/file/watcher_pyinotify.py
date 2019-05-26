@@ -23,6 +23,7 @@ from logging import StreamHandler
 from weakref import ref
 from os import path
 
+from dpt_logging import LogLine
 from dpt_module_loader import NamedClassLoader
 from dpt_threading.instance_lock import InstanceLock
 from dpt_threading.thread_lock import ThreadLock
@@ -68,7 +69,7 @@ Constructor __init__(WatcherPyinotify)
         """
     Thread safety lock
         """
-        self.pyinotify_instance = None
+        self._pyinotify_instance = None
         """
 pyinotify instance
         """
@@ -135,9 +136,11 @@ Initializes the pyinotify instance.
         """
 
         with self._lock:
-            if (self.pyinotify_instance is None):
-                self.pyinotify_instance = pyinotify.ThreadedNotifier(self, WatcherPyinotifyCallback(self), timeout = 5000)
-                self.pyinotify_instance.start()
+            if (self._pyinotify_instance is None):
+                LogLine.debug("{0!r} mode is asynchronous", self, context = "dpt_vfs")
+
+                self._pyinotify_instance = pyinotify.ThreadedNotifier(self, WatcherPyinotifyCallback(self), timeout = 5000)
+                self._pyinotify_instance.start()
             #
         #
     #
@@ -232,9 +235,9 @@ Stops all watchers.
         with self._lock:
             self.free()
 
-            if (self.pyinotify_instance is not None):
-                self.pyinotify_instance.stop()
-                self.pyinotify_instance = None
+            if (self._pyinotify_instance is not None):
+                self._pyinotify_instance.stop()
+                self._pyinotify_instance = None
             #
         #
     #
@@ -273,6 +276,7 @@ Handles deregistration of filesystem watches.
 
                 if (len(self.watched_path_files[directory_path]) < 1):
                     if (not _deleted): self.rm_watch(self.watched_paths[directory_path])
+
                     del(self.watched_path_files[directory_path])
                     del(self.watched_paths[directory_path])
                 #
