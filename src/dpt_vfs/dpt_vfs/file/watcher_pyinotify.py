@@ -93,7 +93,7 @@ pyinotify watch fds
         """
 Destructor __del__(WatcherPyinotify)
 
-:since: v0.1.00
+:since: v1.0.0
         """
 
         self.stop()
