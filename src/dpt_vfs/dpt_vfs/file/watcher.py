@@ -128,7 +128,7 @@ called.
 :since:  v1.0.0
         """
 
-        with Watcher._lock: return (not isinstance(Watcher._instance, WatcherPyinotify))
+        with Watcher._lock: return (WatcherPyinotify is None or (not isinstance(Watcher._instance, WatcherPyinotify)))
     #
 
     def check(self, url):
