@@ -53,6 +53,11 @@ Deleted event
 Created event
     """
 
+    __slots__ = [ ]
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
     _classes = { }
     """
 True if existing watchers have been disabled and no new ones can be

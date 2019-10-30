@@ -54,6 +54,12 @@ Link type
 
     # pylint: disable=invalid-name
 
+    __slots__ = [ "__weakref__" ] + FileLikeCopyMixin._mixin_slots_ + SupportsMixin._mixin_slots_
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
+
     def __init__(self):
         """
 Constructor __init__(Abstract)

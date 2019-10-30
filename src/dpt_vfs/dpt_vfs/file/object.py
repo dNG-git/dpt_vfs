@@ -61,6 +61,12 @@ Provides the VFS implementation for 'file' objects.
 File IO methods implemented by an wrapped resource.
     """
 
+    __slots__ = [ "dir_path_name", "file_path_name", "object_readonly" ] + FileLikeWrapperMixin._mixin_slots_
+    """
+python.org: __slots__ reserves space for the declared variables and prevents
+the automatic creation of __dict__ and __weakref__ for each instance.
+    """
+
     def __init__(self):
         """
 Constructor __init__(Object)
