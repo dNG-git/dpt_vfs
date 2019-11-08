@@ -5,4 +5,4 @@ git+https://git.direct-netware.de/dpt/module_loader/@v1.0.2#egg=dpt-module-loade
 git+https://git.direct-netware.de/dpt/runtime/@v1.0.2#egg=dpt-runtime
 git+https://git.direct-netware.de/dpt/threading/@v1.0.1#egg=dpt-threading
 
-git+https://git.direct-netware.de/dpt/builder_suite/@v1.0.1#egg=dpt-builder-suite[gitsrc]
+git+https://git.direct-netware.de/dpt/builder_suite/@v1.0.1#egg=dpt-builder-suite[build]
