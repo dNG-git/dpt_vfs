@@ -1,0 +1,2 @@
+git+git://git.direct-netware.de/dpt/json/@v1.0.2#egg=dpt-json
+git+git://git.direct-netware.de/dpt/settings/@v1.1.2#egg=dpt-settings
