@@ -90,6 +90,8 @@ Returns the implementing instance.
 :since:  v1.0.0
         """
 
+        # pylint: disable=bad-option-value,useless-return
+
         if (not self.is_valid): raise IOException("VFS object not opened")
         return None
     #

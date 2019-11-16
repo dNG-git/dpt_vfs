@@ -319,7 +319,7 @@ Initializes the watcher instance.
         try: Watcher._instance = instance_callable()
         except OSError:
             if (instance_callable is WatcherMtime): raise
-            else: Watcher._instance = WatcherMtime()
+            Watcher._instance = WatcherMtime()
         #
     #
 #

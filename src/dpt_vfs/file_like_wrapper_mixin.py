@@ -33,6 +33,8 @@ instance.
              Mozilla Public License, v. 2.0
     """
 
+    # pylint: disable=assigning-non-slot
+
     _FILE_WRAPPED_METHODS = ( "flush",
                               "read",
                               "seek",

@@ -38,6 +38,7 @@ class WatcherPyinotifySync(WatcherPyinotify):
              Mozilla Public License, v. 2.0
     """
 
+    # pylint: disable=bad-option-value,slots-on-old-class
     __slots__ = [ ]
     """
 python.org: __slots__ reserves space for the declared variables and prevents

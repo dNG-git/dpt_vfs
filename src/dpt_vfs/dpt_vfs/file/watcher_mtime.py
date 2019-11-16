@@ -83,7 +83,7 @@ Checks a given path for changes if "is_synchronous()" is true.
 
                 if (modified_time < 0):
                     event_type = AbstractWatcher.EVENT_TYPE_DELETED
-                    self.unregister(_path)
+                    self.unregister(_path, None)
                 elif (WatcherMtime._watched_paths[_path] != modified_time):
                     event_type = (AbstractWatcher.EVENT_TYPE_CREATED
                                   if (WatcherMtime._watched_paths[_path] < 0) else

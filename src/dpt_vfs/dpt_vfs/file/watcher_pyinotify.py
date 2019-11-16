@@ -19,7 +19,6 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=import-error,no-name-in-module,unused-argument
 
-from logging import StreamHandler
 from weakref import ref
 from os import path
 
@@ -47,6 +46,7 @@ class WatcherPyinotify(pyinotify.WatchManager):
              Mozilla Public License, v. 2.0
     """
 
+    # pylint: disable=bad-option-value,slots-on-old-class
     __slots__ = [ "__weakref__",
                   "_lock",
                   "_pyinotify_instance",
@@ -307,6 +307,8 @@ Get the WatcherPyinotify singleton.
 :return: (object) Object on success
 :since:  v1.0.0
         """
+
+        # pylint: disable=not-callable
 
         _return = None
 

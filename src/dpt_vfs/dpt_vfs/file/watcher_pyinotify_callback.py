@@ -46,6 +46,7 @@ Processes pyinotify events and calls defined callbacks.
 
     # pylint: disable=invalid-name
 
+    # pylint: disable=bad-option-value,slots-on-old-class
     __slots__ = [ "manager_weakref" ]
     """
 python.org: __slots__ reserves space for the declared variables and prevents

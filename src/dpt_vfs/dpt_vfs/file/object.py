@@ -17,7 +17,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-# pylint: disable=import-error, no-name-in-module
+# pylint: disable=import-error,invalid-name,no-member,no-name-in-module
 
 from os import path
 import os
@@ -48,6 +48,8 @@ Provides the VFS implementation for 'file' objects.
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
     """
+
+    # pylint: disable=unused-argument
 
     _FILE_WRAPPED_METHODS = ( "flush",
                               "is_eof",
@@ -454,7 +456,7 @@ Scan over objects of a collection like a directory.
         """
 
         if (self.file_path_name is not None): raise OperationNotSupportedException("VFS object can not be scanned")
-        elif (self.dir_path_name is None): raise IOException("VFS object not opened")
+        if (self.dir_path_name is None): raise IOException("VFS object not opened")
 
         _return = [ ]
 
