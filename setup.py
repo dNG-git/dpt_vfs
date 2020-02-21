@@ -45,7 +45,12 @@ Returns the version currently in development.
     return "v1.0.2"
 #
 
+with open("requirements.txt", "r") as fp:
+    requirements_list = [ line.strip() for line in fp.readlines() if line.strip() != "" ]
+#
+
 _setup = { "version": get_version()[1:],
+           "install_requires": requirements_list,
            "data_files": [ ( "docs", [ "LICENSE", "README" ]) ],
            "test_suite": "tests"
          }
