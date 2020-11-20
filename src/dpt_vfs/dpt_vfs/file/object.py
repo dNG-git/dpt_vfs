@@ -34,7 +34,10 @@ from dpt_runtime.operation_not_supported_exception import OperationNotSupportedE
 from ...abstract import Abstract
 from ...file_like_wrapper_mixin import FileLikeWrapperMixin
 
-_PathLike = (os.PathLike if (hasattr(os, "PathLike")) else object)
+if (hasattr(os, "PathLike")): _PathLike = os.PathLike
+else:
+    class _PathLike(object): pass
+#
 
 class Object(FileLikeWrapperMixin, _PathLike, Abstract):
     """
