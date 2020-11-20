@@ -117,7 +117,7 @@ Returns true if the object is representing a directory (or collection).
 :since:  v1.0.0
         """
 
-        return (self.type & Abstract.TYPE_DIRECTORY)
+        return bool(self.type & Abstract.TYPE_DIRECTORY)
     #
 
     @property
@@ -141,7 +141,7 @@ Returns true if the object is representing a file.
 :since:  v1.0.0
         """
 
-        return (self.type & Abstract.TYPE_FILE)
+        return bool(self.type & Abstract.TYPE_FILE)
     #
 
     @property
@@ -153,7 +153,7 @@ Returns true if the object is representing a link to another object.
 :since:  v1.0.0
         """
 
-        return (self.type & Abstract.TYPE_LINK)
+        return bool(self.type & Abstract.TYPE_LINK)
     #
 
     @property
