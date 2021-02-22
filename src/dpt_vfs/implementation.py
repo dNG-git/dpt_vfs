@@ -18,8 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 from dpt_module_loader import NamedClassLoader
-from dpt_runtime.binary import Binary
-from dpt_runtime.io_exception import IOException
+from dpt_runtime import Binary
+from dpt_runtime.exceptions import IOException
 
 from .abstract import Abstract
 

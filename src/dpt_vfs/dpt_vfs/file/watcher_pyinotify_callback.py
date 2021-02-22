@@ -25,8 +25,8 @@ from weakref import ref
 try: from urllib.parse import quote_plus
 except ImportError: from urllib import quote_plus
 
-from dpt_runtime.binary import Binary
-from dpt_runtime.exception_log_trap import ExceptionLogTrap
+from dpt_logging import ExceptionLogTrap
+from dpt_runtime import Binary
 from pyinotify import ProcessEvent
 
 from ...abstract_watcher import AbstractWatcher

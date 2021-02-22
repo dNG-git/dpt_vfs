@@ -19,7 +19,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=unused-argument
 
-from dpt_runtime.not_implemented_exception import NotImplementedException
+from dpt_runtime.exceptions import NotImplementedException
 
 class AbstractWatcher(object):
     """

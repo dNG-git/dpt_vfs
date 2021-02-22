@@ -17,7 +17,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dpt_runtime.io_exception import IOException
+from dpt_runtime.exceptions import IOException
 
 class FileLikeWrapperMixin(object):
     """

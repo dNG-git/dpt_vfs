@@ -24,8 +24,7 @@ from os import path
 
 from dpt_logging import LogLine
 from dpt_module_loader import NamedClassLoader
-from dpt_threading.instance_lock import InstanceLock
-from dpt_threading.thread_lock import ThreadLock
+from dpt_threading import InstanceLock, ThreadLock
 import pyinotify
 
 try: from pyinotify import IN_ATTRIB, IN_CLOSE_WRITE, IN_CREATE, IN_DELETE, IN_DELETE_SELF, IN_MODIFY, IN_MOVE_SELF, IN_MOVED_FROM, IN_MOVED_TO

@@ -19,12 +19,9 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 # pylint: disable=unused-argument
 
-from dpt_runtime.file_like_copy_mixin import FileLikeCopyMixin
-from dpt_runtime.io_exception import IOException
-from dpt_runtime.not_implemented_exception import NotImplementedException
-from dpt_runtime.operation_not_supported_exception import OperationNotSupportedException
-from dpt_runtime.supports_mixin import SupportsMixin
-from dpt_runtime.value_exception import ValueException
+from dpt_runtime import SupportsMixin
+from dpt_runtime.exceptions import IOException, NotImplementedException, OperationNotSupportedException, ValueException
+from dpt_runtime.io import FileLikeCopyMixin
 
 class Abstract(FileLikeCopyMixin, SupportsMixin):
     """

@@ -26,7 +26,7 @@ except ImportError:
 #
 
 from dpt_logging import LogLine
-from dpt_threading.instance_lock import InstanceLock
+from dpt_threading import InstanceLock
 
 from ...abstract_watcher import AbstractWatcher
 from .watcher_mtime import WatcherMtime

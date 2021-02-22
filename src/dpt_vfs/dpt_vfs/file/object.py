@@ -28,8 +28,7 @@ except ImportError: from urllib import quote_plus, unquote_plus
 from dpt_file import File
 from dpt_logging import LogLine
 from dpt_mime_type import MimeType
-from dpt_runtime.io_exception import IOException
-from dpt_runtime.operation_not_supported_exception import OperationNotSupportedException
+from dpt_runtime.exceptions import IOException, OperationNotSupportedException
 
 from ...abstract import Abstract
 from ...file_like_wrapper_mixin import FileLikeWrapperMixin

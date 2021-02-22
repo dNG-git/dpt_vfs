@@ -24,8 +24,8 @@ import os
 try: from urllib.parse import quote_plus
 except ImportError: from urllib import quote_plus
 
-from dpt_runtime.exception_log_trap import ExceptionLogTrap
-from dpt_threading.thread_lock import ThreadLock
+from dpt_logging import ExceptionLogTrap
+from dpt_threading import ThreadLock
 
 from ...abstract_watcher import AbstractWatcher
 
