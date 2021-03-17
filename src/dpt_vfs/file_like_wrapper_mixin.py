@@ -46,7 +46,7 @@ instance.
 File IO methods implemented by an wrapped resource.
     """
 
-    _mixin_slots_ = [ "_wrapped_resource" ]
+    _mixin_slots_ = ( "_wrapped_resource", )
     """
 Additional __slots__ used for inherited classes.
     """
